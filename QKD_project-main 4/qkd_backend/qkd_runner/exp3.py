@@ -17,7 +17,7 @@ service = QiskitRuntimeService()
 backend = service.backend("ibm_brisbane")
 print(backend.name)
 
-def run_exp3(message=None, bit_num=120, shots=1024, rng_seed=None):
+def run_exp3(message=None, bit_num=20, shots=1024, rng_seed=None):
     rng = np.random.default_rng(rng_seed)
 
     # Step 1: Sender's random bits and bases
@@ -113,23 +113,18 @@ def run_exp3(message=None, bit_num=120, shots=1024, rng_seed=None):
     fidelity = match_count / len(agoodbits) if agoodbits else 0
     loss = 1 - fidelity if agoodbits else 1
 
-    # Abort key generation if error rate is too high
+    # Define abort reason first
+    abort_reason = None
     if loss > 0.15:
-        print("Error too high! Abort key generation.")
-        agoodbits = []
-        bgoodbits = []
         abort_reason = "Error too high! Key generation aborted."
-    else:
-        abort_reason = None
-        # proceed with error correction & privacy amplification if you have them
 
     return {
         "Sender_bits": abits.tolist(),
         "Sender_bases": abase.tolist(),
         "Receiver_bases": bbase.tolist(),
         "Receiver_bits": bbits,
-        "agoodbits": agoodbits,
-        "bgoodbits": bgoodbits,
+        "agoodbits": agoodbits,  # Return the non-empty list
+        "bgoodbits": bgoodbits,  # Return the non-empty list
         "fidelity": fidelity,
         "loss": loss,
         "circuit_diagram_url": "/static/circuit_exp3.png",
@@ -140,4 +135,3 @@ def run_exp3(message=None, bit_num=120, shots=1024, rng_seed=None):
 
 def run(message=None):
     return run_exp3(message)
-
